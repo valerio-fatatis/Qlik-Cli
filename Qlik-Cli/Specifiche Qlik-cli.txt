@@ -1,0 +1,98 @@
+QLIK-CLI for Saas Edition:
+https://qlik.dev/libraries-and-tools/qlik-cli
+
+Step:
+1) Installazione: https://github.com/qlik-oss/qlik-cli/releases
+2) Installazione Choco: https://chocolatey.org/
+- choco source add --name=nuget.org --source=https://www.nuget.org/api/v2
+- choco install qlik-cli
+- choco upgrade qlik-cli
+3) Creare API Key: https://qlik.dev/basics/authentication-options#api-keys
+4) Inizializzazione dello scenario:
+$ qlik context init
+qlik context use <context-name> (https://<tenant>.<region>.qlikcloud.com)
+5) esempi di istruzioni comando:
+
+Importa nel cloud un'app archiviata localmente.
+qlik app import -f the_app.qvf
+Ulteriori informazioni sulla risorsa dell'app sono disponibili in qlik app --help.
+-------------------------------------------------------------
+Cerca un'app per nome
+qlik item ls --resourceType app --name "app name"
+Ulteriori informazioni sulla risorsa dell'app sono disponibili in qlik item --help.
+-------------------------------------------------------------
+Crea uno spazio gestito e assegna gli utenti
+Per prima cosa crei lo spazio e copia l'ID restituito.
+qlik space create --name "Demo Space" --type managed --quiet
+-------------------------------------------------------------
+Quindi assegni a un utente l'accesso consumatore, collaboratore ed editore fornendo l'ID restituito dalla prima chiamata.
+qlik space assignment create --spaceId=<ID> --type user --roles consumer,contributor,publisher --assigneeId=<userid> -q
+Ulteriori informazioni sulla risorsa dell'app sono disponibili in qlik space --help.
+-------------------------------------------------------------
+Elenco ricariche non riuscite
+Per elencare tutte le tue ricariche inserisci:
+qlik reload ls
+-------------------------------------------------------------
+qlik reload ls | jq '.[] | select(.status == "FAILED")'
+Ulteriori informazioni sulla risorsa dell'app sono disponibili in qlik reload --help.
+-------------------------------------------------------------
+Analizza un'app
+Con qlik app meta, ottieni una panoramica dell'app con informazioni sui suoi campi, tabelle e associazioni.
+-------------------------------------------------------------
+qlik app meta --app <appid/app_name>
+È possibile approfondire ulteriormente e valutare dimensioni o misure.
+-------------------------------------------------------------
+qlik app eval --app <appid/app_name> 'Avg(Revenue)' by 'Country'
+Ulteriori informazioni sulla risorsa dell'app sono disponibili in qlik app eval --help.
+-------------------------------------------------------------
+
+LINK UTILI:
+
+https://github.com/ahaydon/Qlik-Cli-Windows
+https://github.com/ahaydon/Qlik-Cli-Windows/tree/master/docs
+https://qlik.dev/libraries-and-tools/qlik-cli
+https://qlik.dev/tutorials/get-started-with-qlik-cli
+
+QLIK-CLI Windows
+Comandi di installazione e configurazione:
+
+QLIK-CLI Command:
+1) $PSVersionTable.PSVersion (consigliabile update alla 5)
+2) Set-ExecutionPolicy		(s o t)
+	Set-ExecutionPolicy RemoteSigned
+3) Install-Module Qlik-Cli (in C: \ Programmi \ WindowsPowerShell \ Modules \ Qlik-Cli)
+4) Import-Module Qlik-Cli.psm1
+5) Import-Module Qlik-Cli.psd1
+6) Get-Help Qlik
+7) Get-ChildItem cert: CurrentUser \ My |  Where-Object { $ _ .FriendlyName  -eq  ' QlikClient ' } |  Connect-Qlik sense - centrale
+	Get-ChildItem cert:CurrentUser\My | Where-Object { $_.FriendlyName -eq 'QlikClient' } | Connect-Qlik -computername 192.168.1.180 -username valer\P53 -TrustAllCerts
+8) connect-qlik P53 -username P53\valer
+	Connect-Qlik P53 -UseDefaultCredentials
+9) gci cert:\CurrentUser\my | Format-List
+	
+Comandi eescutivi:
+-------------------------------------------------------------------
+Start-QlikTask "Reload Operations Monitor" -wait | Wait-QlikExecution
+Get-QlikApp -filter "stream.name eq 'My Stream'" | Export-QlikApp
+Publish-QlikApp [-80d395a8-1529-4757-a8c8-aba76be418e] [-Everyone] 
+-------------------------------------------------------------------
+# establish context for connecting to Qlik Sense SaaS
+qlik context init
+
+# create an app in the context tenant with a specified name, returns the item id for the app
+qlik app create --attributes-name <appName> -q
+
+# metadata for the app
+qlik app get <appId>
+
+# sets the load script from a supplied filename for a given Qlik app id
+qlik app script set <scriptFileName> --app <appId>
+
+# creates a reload for an app with a supplied resource id
+qlik reload create --appId <resourceId>
+
+# returns status information for the reload associated to the reload id
+qlik reload get <reloadId>
+
+# returns data from the supplied app item id or resource id given an expression using strings to represent the measure(s) and dimension(s) to calculate
+qlik app eval <measure> string by <dimension> string --app <itemId> OR <resourceId>
